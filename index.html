@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>71_egg 下單</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+
+<h2>71_egg 下單</h2>
+
+<label>商品：</label><br>
+<input id="product" value="大谷日曆"><br><br>
+
+<label>數量：</label><br>
+<input id="qty" type="number" value="1"><br><br>
+
+<button onclick="submitOrder()">確認下單</button>
+
+<script>
+async function main() {
+  await liff.init({ liffId: "你的LIFF_ID" });
+}
+main();
+
+async function submitOrder() {
+  const profile = await liff.getProfile();
+
+  const product = document.getElementById("product").value;
+  const qty = document.getElementById("qty").value;
+
+  const msg = `訂單\n姓名:${profile.displayName}\n商品:${product}\n數量:${qty}`;
+
+  await liff.sendMessages([
+    {
+      type: "text",
+      text: msg
+    }
+  ]);
+
+  alert("已送出訂單！");
+  liff.closeWindow();
+}
+</script>
+
+</body>
+</html>
