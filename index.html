@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>LINE 下單確認</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,6 +16,7 @@
       border-radius: 10px;
       padding: 20px;
       margin-top: 20px;
+      text-align: left;
     }
     button {
       margin-top: 20px;
@@ -26,6 +27,11 @@
       border: none;
       border-radius: 8px;
     }
+    .debug {
+      margin-top: 10px;
+      font-size: 12px;
+      color: gray;
+    }
   </style>
 </head>
 <body>
@@ -34,45 +40,59 @@
 
 <div class="box" id="orderInfo"></div>
 
+<div class="debug" id="debug"></div>
+
 <button onclick="sendOrder()">前往LINE送出訂單</button>
 
 <script>
-  const LINE_OA_ID = "@344mwpgw"; // ← 改成你的官方帳ID
+  const LINE_OA_ID = "@344mwpgw";
 
   function getParams() {
     const params = new URLSearchParams(window.location.search);
+
     return {
-      item: params.get("item") || "",
-      color: params.get("color") || "",
-      size: params.get("size") || "",
-      qty: params.get("qty") || "",
-      fbname: params.get("fbname") || ""
+      item: params.get("item"),
+      color: params.get("color"),
+      size: params.get("size"),
+      qty: params.get("qty"),
+      fbname: params.get("fbname")
     };
   }
 
   const data = getParams();
 
+  // 🔥 debug（超重要）
+  document.getElementById("debug").innerText =
+    "DEBUG URL: " + window.location.href;
+
   document.getElementById("orderInfo").innerHTML = `
-    商品：${data.item}<br>
-    顏色：${data.color}<br>
-    尺寸：${data.size}<br>
-    數量：${data.qty}
+    商品：${data.item || "❌ 沒有"}<br>
+    顏色：${data.color || "❌ 沒有"}<br>
+    尺寸：${data.size || "❌ 沒有"}<br>
+    數量：${data.qty || "❌ 沒有"}<br>
+    FB：${data.fbname || "❌ 沒有"}
   `;
 
   function sendOrder() {
-    const message = 
+
+    if (!data.item) {
+      alert("❌ 沒有讀到參數，請檢查網址");
+      return;
+    }
+
+    const message =
 `訂單
-FB:${data.fbname}
-商品:${data.item}
-顏色:${data.color}
-尺寸:${data.size}
-數量:${data.qty}`;
+FB:${data.fbname || ""}
+商品:${data.item || ""}
+顏色:${data.color || ""}
+尺寸:${data.size || ""}
+數量:${data.qty || ""}`;
 
     const encoded = encodeURIComponent(message);
 
-    const url = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encoded}`;
+    // ✔ 正確 LINE OA message 格式
+    const url = `https://line.me/R/oaMessage/${LINE_OA_ID}/${encoded}`;
 
-    // 直接開啟官方LINE聊天室 + 帶訊息
     window.location.href = url;
   }
 </script>
