@@ -34,10 +34,10 @@
 
 <div class="box" id="orderInfo"></div>
 
-<button onclick="sendOrder()">確認送出到LINE</button>
+<button onclick="sendOrder()">前往LINE送出訂單</button>
 
 <script>
-  const LIFF_ID = "2009856088-Y1C8kWVp";
+  const LINE_OA_ID = "@344mwpgw"; // ← 改成你的官方帳ID
 
   function getParams() {
     const params = new URLSearchParams(window.location.search);
@@ -45,7 +45,8 @@
       item: params.get("item") || "",
       color: params.get("color") || "",
       size: params.get("size") || "",
-      qty: params.get("qty") || ""
+      qty: params.get("qty") || "",
+      fbname: params.get("fbname") || ""
     };
   }
 
@@ -58,38 +59,22 @@
     數量：${data.qty}
   `;
 
-  async function init() {
-    await liff.init({ liffId: LIFF_ID });
+  function sendOrder() {
+    const message = 
+`訂單
+FB:${data.fbname}
+商品:${data.item}
+顏色:${data.color}
+尺寸:${data.size}
+數量:${data.qty}`;
 
-    if (!liff.isLoggedIn()) {
-      liff.login();
-    }
+    const encoded = encodeURIComponent(message);
+
+    const url = `https://line.me/R/oaMessage/${LINE_OA_ID}/?${encoded}`;
+
+    // 直接開啟官方LINE聊天室 + 帶訊息
+    window.location.href = url;
   }
-
-  async function sendOrder() {
-    const text = `訂單\n商品:${data.item}\n顏色:${data.color}\n尺寸:${data.size}\n數量:${data.qty}`;
-
-    if (!liff.isInClient()) {
-      alert("請在LINE內開啟");
-      return;
-    }
-
-    try {
-      await liff.sendMessages([
-        {
-          type: "text",
-          text: text
-        }
-      ]);
-      alert("已送出！");
-      liff.closeWindow();
-    } catch (err) {
-      alert("發送失敗");
-      console.error(err);
-    }
-  }
-
-  init();
 </script>
 
 </body>
