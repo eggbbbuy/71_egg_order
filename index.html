@@ -1,46 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8">
-  <title>71_egg 下單</title>
+  <meta charset="UTF-8">
+  <title>LINE 下單確認</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    .box {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 15px 25px;
+      font-size: 18px;
+      background: #06C755;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
 
-<h2>71_egg 下單</h2>
+<h2>確認訂單</h2>
 
-<label>商品：</label><br>
-<input id="product" value="大谷日曆"><br><br>
+<div class="box" id="orderInfo"></div>
 
-<label>數量：</label><br>
-<input id="qty" type="number" value="1"><br><br>
-
-<button onclick="submitOrder()">確認下單</button>
+<button onclick="sendOrder()">確認送出到LINE</button>
 
 <script>
-async function main() {
-  await liff.init({ liffId: "2009856088-Y1C8kWVp" });
-}
-main();
+  const LIFF_ID = "2009856088-Y1C8kWVp";
 
-async function submitOrder() {
-  const profile = await liff.getProfile();
+  function getParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      item: params.get("item") || "",
+      color: params.get("color") || "",
+      size: params.get("size") || "",
+      qty: params.get("qty") || ""
+    };
+  }
 
-  const product = document.getElementById("product").value;
-  const qty = document.getElementById("qty").value;
+  const data = getParams();
 
-  const msg = `訂單\n姓名:${profile.displayName}\n商品:${product}\n數量:${qty}`;
+  document.getElementById("orderInfo").innerHTML = `
+    商品：${data.item}<br>
+    顏色：${data.color}<br>
+    尺寸：${data.size}<br>
+    數量：${data.qty}
+  `;
 
-  await liff.sendMessages([
-    {
-      type: "text",
-      text: msg
+  async function init() {
+    await liff.init({ liffId: LIFF_ID });
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
     }
-  ]);
+  }
 
-  alert("已送出訂單！");
-  liff.closeWindow();
-}
+  async function sendOrder() {
+    const text = `訂單\n商品:${data.item}\n顏色:${data.color}\n尺寸:${data.size}\n數量:${data.qty}`;
+
+    if (!liff.isInClient()) {
+      alert("請在LINE內開啟");
+      return;
+    }
+
+    try {
+      await liff.sendMessages([
+        {
+          type: "text",
+          text: text
+        }
+      ]);
+      alert("已送出！");
+      liff.closeWindow();
+    } catch (err) {
+      alert("發送失敗");
+      console.error(err);
+    }
+  }
+
+  init();
 </script>
 
 </body>
