@@ -20,77 +20,60 @@
     }
     button {
       margin-top: 20px;
-      padding: 15px 25px;
-      font-size: 18px;
+      padding: 15px 20px;
+      font-size: 16px;
       background: #06C755;
       color: white;
       border: none;
       border-radius: 8px;
-    }
-    .debug {
-      margin-top: 10px;
-      font-size: 12px;
-      color: gray;
+      width: 100%;
     }
   </style>
 </head>
+
 <body>
 
 <h2>確認訂單</h2>
 
 <div class="box" id="orderInfo"></div>
 
-<div class="debug" id="debug"></div>
-
-<button onclick="sendOrder()">前往LINE送出訂單</button>
+<button onclick="sendOrder()">前往71_egg官方LINE送出訂單</button>
 
 <script>
   const LINE_OA_ID = "@344mwpgw";
 
   function getParams() {
     const params = new URLSearchParams(window.location.search);
-
     return {
-      item: params.get("item"),
-      color: params.get("color"),
-      size: params.get("size"),
-      qty: params.get("qty"),
-      fbname: params.get("fbname")
+      item: params.get("item") || "",
+      color: params.get("color") || "",
+      size: params.get("size") || "",
+      qty: params.get("qty") || "",
+      fbname: params.get("fbname") || ""
     };
   }
 
   const data = getParams();
 
-  // 🔥 debug（超重要）
-  document.getElementById("debug").innerText =
-    "DEBUG URL: " + window.location.href;
-
   document.getElementById("orderInfo").innerHTML = `
-    商品：${data.item || "❌ 沒有"}<br>
-    顏色：${data.color || "❌ 沒有"}<br>
-    尺寸：${data.size || "❌ 沒有"}<br>
-    數量：${data.qty || "❌ 沒有"}<br>
-    FB：${data.fbname || "❌ 沒有"}
+    商品：${data.item}<br>
+    顏色：${data.color}<br>
+    尺寸：${data.size}<br>
+    數量：${data.qty}<br>
+    FB：${data.fbname}
   `;
 
   function sendOrder() {
-
-    if (!data.item) {
-      alert("❌ 沒有讀到參數，請檢查網址");
-      return;
-    }
-
     const message =
 `訂單
-FB:${data.fbname || ""}
-商品:${data.item || ""}
-顏色:${data.color || ""}
-尺寸:${data.size || ""}
-數量:${data.qty || ""}`;
+FB:${data.fbname}
+商品:${data.item}
+顏色:${data.color}
+尺寸:${data.size}
+數量:${data.qty}`;
 
     const encoded = encodeURIComponent(message);
 
-    // ✔ 正確 LINE OA message 格式
     const url = `https://line.me/R/oaMessage/${LINE_OA_ID}/${encoded}`;
 
     window.location.href = url;
