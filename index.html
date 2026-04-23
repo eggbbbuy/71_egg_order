@@ -46,10 +46,10 @@ button {
 
 <div class="box">
   商品名稱
-  <input id="item" placeholder="例如：BEAMS JAPAN 重磅紅繩短袖T恤">
+  <input id="item" placeholder="例如：BEAMS JAPAN 重磅紅繩短袖T恤" readonly>
 
   單價
-  <input id="price" placeholder="0">
+  <input id="price" placeholder="0" readonly>
 
   明細（顏色 / 尺寸 / 數量 / 多商品都可寫）
   <input id="detail" placeholder="例如：炭灰色L+1 黑色L+1">
@@ -60,6 +60,20 @@ button {
 <script>
 
 const LINE_OA_ID = "@344mwpgw";
+
+// 取得網址參數
+function getParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    item: params.get("item") || "",
+    price: params.get("price") || ""
+  };
+}
+
+// 自動填入 item / price
+const data = getParams();
+document.getElementById("item").value = data.item;
+document.getElementById("price").value = data.price;
 
 function gen() {
   const item = document.getElementById("item").value;
