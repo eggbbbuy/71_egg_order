@@ -37,6 +37,52 @@ button {
   border-radius: 8px;
   width: 100%;
 }
+
+.notice {
+  margin-top: 20px;
+  color: #d9534f;
+  font-weight: bold;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.copy-btn {
+  margin-top: 10px;
+  background: #333;
+}
+
+.desc {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+}
 </style>
 </head>
 
@@ -45,23 +91,40 @@ button {
 <h2>訂單確認</h2>
 
 <div class="box">
-  商品名稱（這裡不用動!）
-  <input id="item" placeholder="例如：BEAMS JAPAN 重磅紅繩短袖T恤" readonly>
+  商品名稱（⚠️這裡不用改）
+  <input id="item" readonly>
 
-  單價（這裡不用動!）
-  <input id="price" placeholder="0" readonly>
+  單價（⚠️這裡不用改）
+  <input id="price" readonly>
 
-  明細（顏色 / 尺寸 / 數量 / 多商品都可寫）
+  下單明細 👇寫這邊就好（顏色 / 尺寸 / 數量 / 多商品都可寫）
   <input id="detail" placeholder="例如：炭灰色L+1 黑色L+1">
 </div>
 
+<div class="notice">
+按下LINE送出訂單按鈕後，會直接開啟官方LINE對話視窗<br>
+訂單內容會出現在聊天輸入框，您確認後直接送出即可
+</div>
+
 <button onclick="gen()">LINE送出訂單</button>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h3>請複製訂單內容</h3>
+    <textarea id="orderText"></textarea>
+    <button class="copy-btn" onclick="copyText()">複製到剪貼簿</button>
+    <div class="desc">
+      電腦版沒辦法自動轉導LINE，<br>
+      下單需要您複製這段文字，並到71_egg小幫手LINE聊天室窗貼上送出
+    </div>
+  </div>
+</div>
 
 <script>
 
 const LINE_OA_ID = "@344mwpgw";
 
-// 取得網址參數
 function getParams() {
   const params = new URLSearchParams(window.location.search);
   return {
@@ -70,29 +133,44 @@ function getParams() {
   };
 }
 
-// 自動填入 item / price
 const data = getParams();
 document.getElementById("item").value = data.item;
 document.getElementById("price").value = data.price;
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
 
 function gen() {
   const item = document.getElementById("item").value;
   const price = document.getElementById("price").value;
   const detail = document.getElementById("detail").value;
 
-  const message =
-`71_egg訂單建立:
-商品:${item}
-單價:${price}
-明細:
-${detail}`;
+  const message = `71_egg訂單建立:\n商品:${item}\n單價:${price}\n明細:\n${detail}`;
 
-  const encoded = encodeURIComponent(message);
+  if (isMobile()) {
+    const encoded = encodeURIComponent(message);
+    const lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/${encoded}`;
+    window.location.href = lineUrl;
+  } else {
+    document.getElementById("orderText").value = message;
+    document.getElementById("modal").style.display = "block";
+  }
+}
 
-  const lineUrl = `https://line.me/R/oaMessage/${LINE_OA_ID}/${encoded}`;
+function copyText() {
+  const text = document.getElementById("orderText");
+  text.select();
+  document.execCommand("copy");
+  alert("已複製！");
+}
 
-  // 直接跳轉 LINE
-  window.location.href = lineUrl;
+// 點擊外面關閉
+window.onclick = function(event) {
+  const modal = document.getElementById("modal");
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
 }
 
 </script>
