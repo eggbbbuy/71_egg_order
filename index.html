@@ -83,6 +83,51 @@ textarea {
   font-size: 14px;
   color: #555;
 }
+
+/* Collapsible "怎麼操作" 區塊 */
+.howto {
+  margin: 24px 0 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  text-align: left;
+}
+.howto summary {
+  cursor: pointer;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #555;
+  user-select: none;
+  list-style: none;
+}
+.howto summary::-webkit-details-marker { display: none; }
+.howto summary::before {
+  content: "▶";
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform .15s;
+  font-size: 10px;
+  color: #999;
+}
+.howto[open] summary::before { transform: rotate(90deg); }
+.howto summary:hover { background: #f0f0f0; }
+.howto-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid #e8e8e8;
+}
+.howto-body p {
+  font-size: 13px;
+  color: #666;
+  margin: 12px 0;
+}
+.howto-body img {
+  width: 100%;
+  max-width: 320px;
+  display: block;
+  margin: 10px auto;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
 </style>
 </head>
 
@@ -108,11 +153,14 @@ textarea {
 
 <button onclick="gen()">LINE送出訂單</button>
 
-<div style="margin-top:30px; text-align:left;">
-  <div style="font-weight:bold; margin-bottom:10px;">案下LINE送出訂單後，會自動轉導LINE:</div>
-  <img src="https://github.com/eggbbbuy/71_egg_order/blob/main/1.jpg?raw=true" style="width:100%; max-width:400px; display:block; margin:10px auto; border-radius:10px;">
-  <img src="https://github.com/eggbbbuy/71_egg_order/blob/main/2.jpg?raw=true" style="width:100%; max-width:400px; display:block; margin:10px auto; border-radius:10px;">
-</div>
+<details class="howto">
+  <summary>按下「LINE送出訂單」會發生什麼事？(點此展開)</summary>
+  <div class="howto-body">
+    <p>按下按鈕後會自動跳到 LINE 對話視窗,訂單內容預先填好,確認後直接送出即可.</p>
+    <img src="https://github.com/eggbbbuy/71_egg_order/blob/main/1.jpg?raw=true" alt="step 1">
+    <img src="https://github.com/eggbbbuy/71_egg_order/blob/main/2.jpg?raw=true" alt="step 2">
+  </div>
+</details>
 
 <!-- Modal -->
 <div id="modal" class="modal">
